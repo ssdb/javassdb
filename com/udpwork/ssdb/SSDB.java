@@ -1,5 +1,8 @@
 package com.udpwork.ssdb;
 
+import java.util.List;
+
+
 /**
  * SSDB Java client SDK.
  * Example:
@@ -24,7 +27,19 @@ public class SSDB{
 	public void close(){
 		link.close();
 	}
+
+	public Response request(String cmd, byte[]...params) throws Exception{
+		return link.request(cmd, params);
+	}
+
+	public Response request(String cmd, String...params) throws Exception{
+		return link.request(cmd, params);
+	}
 	
+	public Response request(String cmd, List<byte[]> params) throws Exception{
+		return link.request(cmd, params);
+	}
+
 	/* kv */
 
 	public void set(byte[] key, byte[] val) throws Exception{

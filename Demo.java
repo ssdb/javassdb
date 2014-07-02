@@ -9,6 +9,14 @@ public class Demo {
 		Response resp;
 		byte[] b;
 		ssdb = new SSDB("127.0.0.1", 8888);
+
+		// 注意: 如果某个命令没有对应的函数, 你就使用 request() 方法来执行
+		resp = ssdb.request("qpush", "q", "a");
+		for(int i=1; i<resp.raw.size(); i+=2){
+			String s = new String(resp.raw.get(i));
+			System.out.println(s);
+		}
+
 		
 		/* kv */
 		System.out.println("---- kv -----");
