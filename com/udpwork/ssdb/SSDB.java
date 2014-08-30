@@ -243,15 +243,15 @@ public class SSDB{
 	
 	/* zset */
 
-	public void zset(String name, byte[] key, double score) throws Exception{
-		Response resp = link.request("zset", name.getBytes(), key, (new Double(score)).toString().getBytes());
+	public void zset(String name, byte[] key, long score) throws Exception{
+		Response resp = link.request("zset", name.getBytes(), key, (new Long(score)).toString().getBytes());
 		if(resp.ok()){
 			return;
 		}
 		resp.exception();
 	}
 	
-	public void zset(String name, String key, double score) throws Exception{
+	public void zset(String name, String key, long score) throws Exception{
 		zset(name, key.getBytes(), score);
 	}
 	
@@ -271,36 +271,36 @@ public class SSDB{
 	 * 
 	 * @param name
 	 * @param key
-	 * @return Double.NaN if not found.
+	 * @return null if not found.
 	 * @throws Exception
 	 */
-	public double zget(String name, byte[] key) throws Exception{
+	public Long zget(String name, byte[] key) throws Exception{
 		Response resp = link.request("zget", name.getBytes(), key);
 		if(resp.not_found()){
-			return Double.NaN;
+			return null;
 		}
 		if(resp.raw.size() != 2){
 			throw new Exception("Invalid response");
 		}
 		if(resp.ok()){
-			return Double.parseDouble(new String(resp.raw.get(1)));
+			return Long.parseLong(new String(resp.raw.get(1)));
 		}
 		resp.exception();
-		return 0;
+		return new Long(0);
 	}
 
 	/**
 	 * 
 	 * @param name
 	 * @param key
-	 * @return Double.NaN if not found.
+	 * @return null if not found.
 	 * @throws Exception
 	 */
-	public double zget(String name, String key) throws Exception{
+	public Long zget(String name, String key) throws Exception{
 		return zget(name, key.getBytes());
 	}
 
-	private Response _zscan(String cmd, String name, String key, Double score_start, Double score_end, int limit) throws Exception{
+	private Response _zscan(String cmd, String name, String key, Long score_start, Long score_end, int limit) throws Exception{
 		if(key == null){
 			key = "";
 		}
@@ -325,11 +325,11 @@ public class SSDB{
 		return resp;
 	}
 	
-	public Response zscan(String name, String key, Double score_start, Double score_end, int limit) throws Exception{
+	public Response zscan(String name, String key, Long score_start, Long score_end, int limit) throws Exception{
 		return this._zscan("zscan", name, key, score_start, score_end, limit);
 	}
 	
-	public Response zrscan(String name, String key, Double score_start, Double score_end, int limit) throws Exception{
+	public Response zrscan(String name, String key, Long score_start, Long score_end, int limit) throws Exception{
 		return this._zscan("zrscan", name, key, score_start, score_end, limit);
 	}
 	

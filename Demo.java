@@ -53,8 +53,8 @@ public class Demo {
 		/* zset */
 		System.out.println("---- zset -----");
 
-		double d;
-		ssdb.zset("n", "a", 1.23);
+		Long d;
+		ssdb.zset("n", "a", 123);
 		d = ssdb.zget("n", "a");
 		System.out.println(d);
 		ssdb.zdel("n", "a");
