@@ -5,34 +5,15 @@ import com.udpwork.ssdb.*;
  */
 public class Test {
 	public static void main(String[] args) throws Exception {
-		String k = "k";
-		String v = "1";
-		int i = 0;
-		while (true) {
-			SSDB ssdb = null;
-			try {           
-				ssdb = new SSDB("127.0.0.1", 8888,5000);                       
-				ssdb.set(k,v);  //这里的k确保每次都不同，v 平均 1M大小
-				ssdb.close();
-			} catch (Exception e) {
-				if(ssdb != null){
-					ssdb.close();
-				}           
-				continue;
-			}finally{
-				if(ssdb != null){
-					ssdb.close();
-				}
-			}
-			if(ssdb != null){
-				ssdb.close();
-			}           
-
-			if(++i % 1000 == 1){
-				System.out.println("press Enter");
-				System.in.read();
-			}
+		String s = "3\r\nget\n1\r\nk\r\n\r\n";
+		s += s;
+		s += s;
+		byte[] bytes = s.getBytes();
+		Link link = new Link();
+		link.testRead(bytes);
+		for(int i=0; i<bytes.length; i++){
+			byte[] bs = {bytes[i]};
+			link.testRead(bs);
 		}
-
 	}
 }

@@ -4,8 +4,8 @@ import java.util.Arrays;
 
 public class MemoryStream {
 	private int capacity;
-	public int data = 0;
-	public int slot = 0;
+	private int data = 0;
+	private int slot = 0;
 	public int size = 0;
 	public byte[] buf;
 	
@@ -122,5 +122,15 @@ public class MemoryStream {
 			}
 		}
 		return -1;
+	}
+	
+	public byte chatAt(int offset){
+		return buf[data + offset];
+	}
+	
+	// end - exclusive
+	public byte[] copyOfRange(int start, int end){
+		byte[] ret = Arrays.copyOfRange(buf, data + start, data + end);
+		return ret;
 	}
 }

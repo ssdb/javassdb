@@ -9,6 +9,7 @@ public class Demo {
 		Response resp;
 		byte[] b;
 		ssdb = new SSDB("127.0.0.1", 8888);
+		System.out.println("---- connected -----");
 
 		// 注意: 如果某个命令没有对应的函数, 你就使用 request() 方法来执行
 		resp = ssdb.request("qpush", "q", "a");

@@ -10,6 +10,10 @@ import java.util.List;
 public class Link {
 	private Socket sock;
 	private MemoryStream input = new MemoryStream();
+	
+	public Link(){
+		
+	}
 
 	public Link(String host, int port) throws Exception{
 		this(host, port, 0);
@@ -69,9 +73,8 @@ public class Link {
 	}
 	
 	private void send(MemoryStream buf) throws Exception{
-		//System.out.println(">> " + buf.printable());
 		OutputStream os = sock.getOutputStream();
-		os.write(buf.buf, buf.data, buf.size);
+		os.write(buf.toArray());
 		os.flush();
 	}
 	
@@ -90,36 +93,65 @@ public class Link {
 		}
 	}
 	
-	private List<byte[]> parse(){
+	public void testRead(byte[] data) throws Exception{
+		input.write(data, 0, data.length);
+		System.out.println("<< " +input.repr());
+		
+		List<byte[]> ret = parse();
+		if(ret != null){
+			System.out.println("---------------------");
+			for (byte[] bs : ret) {
+				System.out.println(String.format("%-15s", MemoryStream.repr(bs)));
+			}
+		}
+	}
+	
+	private List<byte[]> parse() throws Exception{
 		ArrayList<byte[]> list = new ArrayList<byte[]>();
-		byte[] buf = input.buf;
 		
 		int idx = 0;
-		while(true){
-			int pos = input.memchr('\n', idx);
-			//System.out.println("pos: " + pos + " idx: " + idx);
-			if(pos == -1){
+		// ignore leading empty lines
+		while(idx < input.size && (input.chatAt(idx) == '\r' || input.chatAt(idx) == '\n')){
+			idx ++;
+		}
+		
+		while(idx < input.size){
+			int data_idx = input.memchr('\n', idx);
+			if(data_idx == -1){
 				break;
 			}
-			if(pos == idx || (pos == idx + 1 && buf[idx] == '\r')){
-				// ignore empty leading lines
-				if(list.isEmpty()){
-					idx += 1; // if '\r', next time will skip '\n'
-					continue;
-				}else{
-					input.decr(idx + 1);
-					return list;
-				}
+			data_idx += 1;
+			
+			int head_len = data_idx - idx;
+			if(head_len == 1 || (head_len == 2 && input.chatAt(idx) == '\r')){
+				input.decr(data_idx);
+				return list;
 			}
-			String str = new String(buf, input.data + idx, pos - idx);
-			int len = Integer.parseInt(str);
-			idx = pos + 1;
-			if(idx + len >= input.size){
+			String str = new String(input.copyOfRange(idx, data_idx));
+			str = str.trim();
+			int size;
+			try{
+				size = Integer.parseInt(str, 10);
+			}catch(Exception e){
+				throw new Exception("Parse body_len error");
+			}
+			
+			idx = data_idx + size;
+
+			int left = input.size - idx;
+			if(left >= 1 && input.chatAt(idx) == '\n'){
+				idx += 1;
+			}else if(left >= 2 && input.chatAt(idx) == '\r' && input.chatAt(idx+1) == '\n'){
+				idx += 2;
+			}else if(left >= 2){
+				throw new Exception("bad format");
+			}else{
 				break;
 			}
-			byte[] data = Arrays.copyOfRange(buf, input.data + idx, input.data + idx + len);
-			//System.out.println("len: " + len + " data: " + data.length);
-			idx += len + 1; // skip '\n'
+			// System.out.println("size: " + size + " idx: " + idx + " left: " + (input.size - idx));
+			
+			byte[] data = input.copyOfRange(data_idx, data_idx + size);
+			//System.out.println("size: " + size + " data: " + data.length);
 			list.add(data);
 		}
 		return null;		
