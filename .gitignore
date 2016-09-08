@@ -5,4 +5,7 @@
 *.pyc
 *.swp
 *_cpy_*
+.project
+.classpath
+target
 
