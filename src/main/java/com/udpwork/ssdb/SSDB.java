@@ -40,6 +40,16 @@ public class SSDB{
 		return link.request(cmd, params);
 	}
 
+	/* auth */
+
+	public void auth(String password) throws Exception{
+		Response resp = link.request("auth", password);
+		if(resp.ok()){
+			return;
+		}
+		resp.exception();
+	}
+
 	/* kv */
 
 	public void set(byte[] key, byte[] val) throws Exception{
