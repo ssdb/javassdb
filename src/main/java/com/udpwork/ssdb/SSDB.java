@@ -319,7 +319,7 @@ public class SSDB{
 			ss = score_start.toString();
 		}
 		String se ="";
-		if(score_start != null){
+		if(score_end != null){
 			se = score_end.toString();
 		}
 		Response resp = link.request(cmd, name, key, ss, se, (new Integer(limit)).toString());
